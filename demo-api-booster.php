@@ -48,7 +48,21 @@ final class ApiBooster {
 			return;
 		}
 
-		$hooks_to_remove_in_checkout = [
+		// 只保留需要的插件
+		$required_plugins = [
+			'woocommerce/woocommerce.php',
+			'woomp/woomp.php'
+		];
+
+		// 檢查是否所有必要的插件都已經載入
+		// 取得所有已啟用的插件
+		$active_plugins = (array) \get_option('active_plugins');
+		$all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
+		if (count($all_required_plugins_included) !== count($required_plugins)) {
+			return;
+		}
+
+				$hooks_to_remove_in_checkout = [
 			'widgets_init',
 			'register_sidebar',
 			'wp_register_sidebar_widget',
@@ -80,21 +94,6 @@ final class ApiBooster {
 				},
 				-999999
 				);
-		}
-
-		// 取得所有已啟用的插件
-		$active_plugins = (array) \get_option('active_plugins');
-
-		// 只保留需要的插件
-		$required_plugins = [
-			'woocommerce/woocommerce.php',
-			'woomp/woomp.php'
-		];
-
-		// 檢查是否所有必要的插件都已經載入
-		$all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
-		if (count($all_required_plugins_included) !== count($required_plugins)) {
-			return;
 		}
 
 		\add_filter('option_active_plugins', fn () => $required_plugins );
